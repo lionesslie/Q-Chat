@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Q-Chat — Premium real-time messaging platform">
+    <meta name="theme-color" content="#0d1117">
+    <link rel="manifest" href="/static/manifest.json">
+    <title>Q-Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+    <!-- ═══════════ STARS BACKGROUND ═══════════ -->
+    <div id="stars-container"></div>
+
+    <!-- ═══════════ AUTH VIEW ═══════════ -->
+    <div id="auth-view" class="view active">
+        <div class="auth-wrapper">
+            <div class="liquid-glass auth-panel">
+                <div class="auth-logo">
+                    <h1>Q-Chat</h1>
+                </div>
+
+                <!-- Giriş Formu -->
+                <form id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login-username">Kullanıcı Adı</label>
+                        <input type="text" id="login-username" autocomplete="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Şifre</label>
+                        <input type="password" id="login-password" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Giriş Yap</button>
+                    <p class="auth-switch">
+                        Hesabın yok mu?
+                        <a href="#" id="show-register">Kayıt Ol</a>
+                    </p>
+                </form>
+
+                <!-- Kayıt Formu -->
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="reg-username">Kullanıcı Adı</label>
+                        <input type="text" id="reg-username" autocomplete="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">E-posta</label>
+                        <input type="email" id="reg-email" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Şifre</label>
+                        <input type="password" id="reg-password" autocomplete="new-password" required>
+                    </div>
+
+                    <button type="submit" id="reg-submit-btn" class="btn btn-primary">Kayıt Ol</button>
+
+                    <p class="auth-switch">
+                        Zaten hesabın var mı?
+                        <a href="#" id="show-login">Giriş Yap</a>
+                    </p>
+                </form>
+
+                <!-- Doğrulama Formu -->
+                <form id="verification-form" class="auth-form">
+                    <div class="form-group" style="text-align: center; margin-bottom: 24px;">
+                        <i data-lucide="mail" stroke="#fff" stroke-width="1.5" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.8;"></i>
+                        <p style="color: var(--text-dim); font-size: 13px; line-height: 1.5; letter-spacing: 0.5px;">
+                            E-posta adresinize 6 haneli bir<br>doğrulama kodu gönderdik.</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-verification-code">Doğrulama Kodu</label>
+                        <input type="text" id="reg-verification-code" placeholder="------" maxlength="6" required
+                            style="text-align: center; letter-spacing: 8px; font-size: 18px; font-weight: bold;">
+                    </div>
+                    <button type="submit" id="verify-submit-btn" class="btn btn-primary">Doğrula ve Kayıt Ol</button>
+                    <p class="auth-switch">
+                        Yanlış bilgi mi girdin?
+                        <a href="#" id="show-register-back">Geri Dön</a>
+                    </p>
+                </form>
+
+                <div id="auth-error" class="error-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ CHAT VIEW ═══════════ -->
+    <div id="chat-view" class="view">
+        <div class="chat-layout">
+
+            <!-- ── Sidebar ── -->
+            <aside id="sidebar" class="liquid-glass sidebar">
+                <div class="sidebar-header">
+                    <h2 class="logo-small">Q-Chat</h2>
+                    <button id="logout-btn" class="btn-icon" title="Cikis Yap">
+                        <i data-lucide="log-out" width="18" height="18" stroke-width="2"></i>
+                    </button>
+                </div>
+
+                <div class="sidebar-user-info" id="sidebar-user-info">
+                    <div class="user-avatar clickable" id="my-avatar" title="Profili Düzenle"></div>
+                    <span id="my-display-name"></span>
+                </div>
+
+                <!-- Nav Tabs -->
+                <nav class="sidebar-nav">
+                    <button class="nav-tab active" data-tab="general">
+                        <i data-lucide="message-square" width="16" height="16" stroke-width="2"></i>
+                        Genel Sohbet
+                    </button>
+                    <button class="nav-tab" data-tab="private">
+                        <i data-lucide="users" width="16" height="16" stroke-width="2"></i>
+                        Kişiler
+                    </button>
+                    <button class="nav-tab" data-tab="rooms">
+                        <i data-lucide="layout-grid" width="16" height="16" stroke-width="2"></i>
+                        Odalar
+                    </button>
+                    <button class="nav-tab" data-tab="projects">
+                        <i data-lucide="folder" width="16" height="16" stroke-width="2"></i>
+                        Projeler
+                    </button>
+                </nav>
+
+                <!-- Tab Contents -->
+                <div class="sidebar-content">
+                    <!-- Online Users (for Private tab) -->
+                    <div class="tab-content" data-content="private">
+                        <div class="section-title">Çevrimiçi Kişiler</div>
+                        <ul id="user-list" class="user-list"></ul>
+                    </div>
+
+                    <!-- Rooms -->
+                    <div class="tab-content" data-content="rooms">
+                        <button id="create-room-btn" class="btn btn-secondary btn-block">
+                            + Oda Olustur
+                        </button>
+                        <ul id="room-list" class="room-list"></ul>
+                    </div>
+
+                    <!-- General (just shows online count) -->
+                    <div class="tab-content active" data-content="general">
+                        <div class="section-title">Genel Sohbet</div>
+                        <p class="online-count"><span id="online-count">0</span> Kişi Çevrimiçi</p>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="tab-content" data-content="projects">
+                        <button id="upload-project-btn" class="btn btn-secondary btn-block">
+                            <i data-lucide="upload" width="14" height="14" stroke-width="2"></i>
+                            Proje Yükle
+                        </button>
+                        <div class="section-title" style="margin-top: 12px;">Projeler</div>
+                        <div id="project-list" class="project-list"></div>
+                    </div>
+                </div>
+
+                <!-- ═══════════ SIDEBAR VOICE PANEL ═══════════ -->
+                <div id="voice-panel" class="sidebar-voice-panel hidden">
+                    <div class="sidebar-voice-header">
+                        <span class="voice-status">
+                            <span class="voice-pulse"></span>
+                            Sesli Sohbet
+                        </span>
+                    </div>
+                    <div class="sidebar-voice-participants">
+                        <div class="sidebar-voice-title">Katılımcılar</div>
+                        <div id="voice-participants" class="voice-participants-list"></div>
+                    </div>
+                    <div class="sidebar-voice-controls">
+                        <button id="voice-mute-btn" class="voice-control-btn voice-mute-btn" title="Sessize Al">
+                            <i data-lucide="mic" class="mic-on" width="20" height="20" stroke-width="2"></i>
+                            <i data-lucide="mic-off" class="mic-off" width="20" height="20" stroke-width="2"></i>
+                            <span class="voice-control-label">Mikrofon</span>
+                        </button>
+                        <button id="screen-share-btn" class="voice-control-btn hidden" title="Ekran Paylaş">
+                            <i data-lucide="monitor-up" width="20" height="20" stroke-width="2"></i>
+                            <span class="voice-control-label">Ekran</span>
+                        </button>
+                        <button id="voice-leave-btn" class="voice-control-btn voice-leave-btn" title="Ayrıl">
+                            <i data-lucide="user-minus" width="20" height="20" stroke-width="2"></i>
+                            <span class="voice-control-label">Ayrıl</span>
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ── Main Chat Area ── -->
+            <main class="chat-main">
+                <!-- Chat Header -->
+                <div class="chat-header liquid-glass">
+                    <button id="sidebar-toggle" class="btn-icon mobile-only">
+                        <i data-lucide="menu" width="20" height="20" stroke-width="2"></i>
+                    </button>
+                    <div class="chat-header-info">
+                        <h3 id="chat-title">Genel Sohbet</h3>
+                        <span id="chat-subtitle" class="chat-subtitle"></span>
+                    </div>
+                    <div class="chat-header-actions">
+                        <button id="voice-toggle-btn" class="btn-icon voice-btn" title="Sesli Sohbet">
+                            <i data-lucide="phone" width="20" height="20" stroke-width="2"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+
+                <!-- Screen Share Viewer -->
+                <div id="screen-share-viewer" class="screen-share-viewer liquid-glass hidden">
+                    <div class="screen-share-header">
+                        <span class="screen-share-label">
+                            <i data-lucide="monitor" width="14" height="14" stroke-width="2"></i>
+                            Ekran Paylaşımı
+                        </span>
+                        <button id="screen-share-close" class="btn-icon" title="Kapat">
+                            <i data-lucide="x" width="16" height="16" stroke-width="2"></i>
+                        </button>
+                    </div>
+                    <video id="screen-share-video" autoplay playsinline></video>
+                </div>
+
+                <!-- Messages -->
+                <div id="messages-container" class="messages-container">
+                    <div id="messages" class="messages"></div>
+                </div>
+
+                <!-- Project Detail View (hidden by default) -->
+                <div id="project-detail-view" class="project-detail-view hidden">
+                    <div class="project-detail-header">
+                        <button id="project-back-btn" class="btn-icon" title="Geri">
+                            <i data-lucide="chevron-left" width="18" height="18" stroke-width="2"></i>
+                        </button>
+                        <h3 id="project-detail-title">Proje Adı</h3>
+                    </div>
+
+                    <!-- Hero Image (shown only when project has an image) -->
+                    <div id="project-detail-hero" class="project-detail-hero hidden">
+                        <img id="project-detail-hero-img" src="" alt="Proje Görseli" />
+                    </div>
+
+                    <div class="project-detail-body">
+                        <!-- Meta Grid with Icons -->
+                        <div class="project-detail-meta">
+                            <div class="project-meta-item">
+                                <div class="project-meta-icon">
+                                    <i data-lucide="user" width="14" height="14" stroke-width="2"></i>
+                                </div>
+                                <div class="project-meta-info">
+                                    <span class="project-meta-label">Yükleyen</span>
+                                    <span class="project-meta-value" id="project-detail-uploader"></span>
+                                </div>
+                            </div>
+                            <div class="project-meta-item">
+                                <div class="project-meta-icon">
+                                    <i data-lucide="file-text" width="14" height="14" stroke-width="2"></i>
+                                </div>
+                                <div class="project-meta-info">
+                                    <span class="project-meta-label">Dosya</span>
+                                    <span class="project-meta-value" id="project-detail-filename"></span>
+                                </div>
+                            </div>
+                            <div class="project-meta-item">
+                                <div class="project-meta-icon">
+                                    <i data-lucide="hard-drive" width="14" height="14" stroke-width="2"></i>
+                                </div>
+                                <div class="project-meta-info">
+                                    <span class="project-meta-label">Boyut</span>
+                                    <span class="project-meta-value" id="project-detail-size"></span>
+                                </div>
+                            </div>
+                            <div class="project-meta-item">
+                                <div class="project-meta-icon">
+                                    <i data-lucide="calendar" width="14" height="14" stroke-width="2"></i>
+                                </div>
+                                <div class="project-meta-info">
+                                    <span class="project-meta-label">Tarih</span>
+                                    <span class="project-meta-value" id="project-detail-date"></span>
+                                </div>
+                            </div>
+                            <div class="project-meta-item">
+                                <div class="project-meta-icon">
+                                    <i data-lucide="download" width="14" height="14" stroke-width="2"></i>
+                                </div>
+                                <div class="project-meta-info">
+                                    <span class="project-meta-label">İndirme</span>
+                                    <span class="project-meta-value" id="project-detail-downloads"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        <div class="project-detail-section">
+                            <div class="project-detail-section-label">
+                                <i data-lucide="tag" width="12" height="12" stroke-width="2"></i>
+                                Etiketler
+                            </div>
+                            <div class="project-detail-tags" id="project-detail-tags"></div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="project-detail-section">
+                            <div class="project-detail-section-label">
+                                <i data-lucide="align-left" width="12" height="12" stroke-width="2"></i>
+                                Açıklama
+                            </div>
+                            <div class="project-detail-description" id="project-detail-description"></div>
+                        </div>
+
+                        <!-- Download Button -->
+                        <div class="project-detail-actions">
+                            <button id="project-download-btn" class="btn btn-primary project-download-btn-lg">
+                                <i data-lucide="download" width="18" height="18" stroke-width="2"></i>
+                                <span>Projeyi İndir</span>
+                                <span id="project-detail-size-badge" class="project-size-badge"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div class="chat-input liquid-glass" id="chat-input-area">
+                    <button id="image-upload-btn" class="btn-icon" title="Görsel Gönder">
+                        <i data-lucide="image" width="18" height="18" stroke-width="2"></i>
+                    </button>
+                    <input type="file" id="chat-image-input" accept="image/*" hidden>
+                    <input type="text" id="message-input" placeholder="Mesajinizi yazin..." autocomplete="off">
+                    <button id="send-btn" class="btn btn-primary btn-send">
+                        <i data-lucide="send" width="18" height="18" stroke-width="2"></i>
+                    </button>
+                </div>
+                <!-- Image Preview -->
+                <div id="chat-image-preview" class="chat-image-preview hidden">
+                    <img id="chat-image-preview-img" src="" alt="Önizleme">
+                    <button id="chat-image-preview-remove" class="btn-icon" title="Kaldır">
+                        <i data-lucide="x" width="14" height="14" stroke-width="2"></i>
+                    </button>
+                </div>
+
+                <!-- Projects Main View (replaces chat when on projects tab) -->
+                <div id="projects-main-view" class="projects-main-view hidden">
+                    <div class="projects-main-header">
+                        <div class="projects-main-title">
+                            <i data-lucide="folder" width="22" height="22" stroke-width="2"></i>
+                            <h3>Projeler</h3>
+                            <span id="projects-count" class="projects-count">0</span>
+                        </div>
+                        <div class="projects-search-wrapper">
+                            <i data-lucide="search" class="projects-search-icon" width="16" height="16" stroke-width="2"></i>
+                            <input type="text" id="projects-search-input" class="projects-search-input"
+                                placeholder="Proje ara..." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="projects-toolbar">
+                        <div class="projects-sort">
+                            <button class="projects-sort-btn active" data-sort="newest">Yeni</button>
+                            <button class="projects-sort-btn" data-sort="name">A-Z</button>
+                            <button class="projects-sort-btn" data-sort="downloads">Popüler</button>
+                            <button class="projects-sort-btn" data-sort="size">Boyut</button>
+                        </div>
+                    </div>
+                    <div id="projects-main-grid" class="projects-main-grid"></div>
+                </div>
+            </main>
+        </div>
+
+
+    </div>
+
+    <!-- ═══════════ CREATE ROOM MODAL ═══════════ -->
+    <div id="room-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="liquid-glass modal-content">
+            <h3>Yeni Oda Oluştur</h3>
+            <div class="form-group">
+                <label for="room-name-input">Oda Adı</label>
+                <input type="text" id="room-name-input" placeholder="Oda adını girin..." maxlength="40">
+            </div>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn btn-secondary">Iptal</button>
+                <button id="modal-create" class="btn btn-primary">Oluştur</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ PROFILE MODAL ═══════════ -->
+    <div id="profile-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="liquid-glass modal-content profile-modal-content">
+            <h3>Profil</h3>
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-large" id="profile-avatar-preview"></div>
+                    <span id="profile-status-badge" class="profile-status-badge online"></span>
+                    <label for="avatar-upload" class="avatar-upload-overlay" title="Fotoğraf Değiştir">
+                        <i data-lucide="camera" width="20" height="20" stroke-width="2"></i>
+                    </label>
+                    <input type="file" id="avatar-upload" accept="image/*" hidden>
+                </div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-info-row">
+                    <span class="profile-label">Kullanıcı Adı</span>
+                    <span class="profile-value" id="profile-username"></span>
+                </div>
+                <div class="profile-info-row">
+                    <span class="profile-label">E-posta</span>
+                    <span class="profile-value" id="profile-email"></span>
+                </div>
+                <div class="profile-info-row">
+                    <span class="profile-label">Katılım Tarihi</span>
+                    <span class="profile-value" id="profile-join-date"></span>
+                </div>
+                <div class="profile-info-row profile-bio-row">
+                    <span class="profile-label">Hakkımda</span>
+                    <textarea id="profile-bio-input" class="profile-bio-textarea" placeholder="Kendinizden bahsedin..."
+                        rows="3" maxlength="150"></textarea>
+                    <button id="save-bio-btn" class="btn btn-sm btn-primary" style="margin-top: 6px;">Kaydet</button>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="profile-close" class="btn btn-secondary">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ PROJECT UPLOAD MODAL ═══════════ -->
+    <div id="project-upload-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="liquid-glass modal-content project-upload-modal-content">
+            <h3>Proje Yükle</h3>
+            <div class="form-group">
+                <label for="project-name-input">Proje Adı</label>
+                <input type="text" id="project-name-input" placeholder="Proje adını girin..." maxlength="100">
+            </div>
+            <div class="form-group">
+                <label for="project-desc-input">Açıklama</label>
+                <textarea id="project-desc-input" placeholder="Proje hakkında kısa bir açıklama..." rows="3"
+                    maxlength="500" class="form-textarea"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="project-tags-input">Etiketler</label>
+                <input type="text" id="project-tags-input" placeholder="Etiketler (virgülle ayırın: oyun, web, araç...)"
+                    maxlength="200">
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Proje Dosyası (Max 100GB)</label>
+                <div class="file-upload-area" id="file-upload-area" style="padding: 15px; border-style: dashed;">
+                    <i data-lucide="upload" width="24" height="24" stroke-width="1.5"></i>
+                    <p class="file-upload-text">Dosya seçmek için tıklayın (Max 100GB)</p>
+                    <input type="file" id="project-file-input" hidden>
+                </div>
+                <div id="selected-file-info" class="selected-file-info hidden" style="margin-top: 8px;">
+                    <i data-lucide="file" width="14" height="14" stroke-width="2"></i>
+                    <span id="selected-file-name"></span>
+                    <button id="remove-file-btn" class="btn-icon btn-icon-sm" title="Kaldır">
+                        <i data-lucide="x" width="12" height="12" stroke-width="2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Proje Görseli (İsteğe Bağlı)</label>
+                <div class="file-upload-area image-upload-area" id="image-upload-area"
+                    style="padding: 15px; border-style: dashed;">
+                    <i data-lucide="image" width="24" height="24" stroke-width="1.5"></i>
+                    <p class="file-upload-text">Görsel seçmek için tıklayın (Max 20MB)</p>
+                    <input type="file" id="project-image-input" accept="image/*" hidden>
+                </div>
+                <div id="selected-image-info" class="selected-file-info hidden" style="margin-top: 8px;">
+                    <i data-lucide="image" width="14" height="14" stroke-width="2"></i>
+                    <span id="selected-image-name"></span>
+                    <button id="remove-image-btn" class="btn-icon btn-icon-sm" title="Kaldır">
+                        <i data-lucide="x" width="12" height="12" stroke-width="2"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="upload-progress" class="upload-progress hidden" style="margin-top: 15px;">
+                <div class="upload-progress-bar" id="upload-progress-bar"></div>
+            </div>
+
+
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button id="project-upload-cancel" class="btn btn-secondary">İptal</button>
+                <button id="project-upload-submit" class="btn btn-primary">Yükle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ PUBLIC PROFILE MODAL ═══════════ -->
+    <div id="public-profile-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="liquid-glass modal-content profile-modal-content">
+            <h3>Kullanıcı Profili</h3>
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrapper">
+                    <div class="profile-avatar-large" id="public-profile-avatar-preview"></div>
+                    <span id="public-profile-status-badge" class="profile-status-badge"></span>
+                </div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-info-row">
+                    <span class="profile-label">Kullanıcı Adı</span>
+                    <span class="profile-value" id="public-profile-username"></span>
+                </div>
+                <div class="profile-info-row">
+                    <span class="profile-label">Durum</span>
+                    <span class="profile-value" id="public-profile-status-text"></span>
+                </div>
+                <div class="profile-info-row">
+                    <span class="profile-label">Hakkımda</span>
+                    <div class="profile-value profile-bio-display" id="public-profile-bio"></div>
+                </div>
+                <div class="profile-info-row">
+                    <span class="profile-label">Katılım Tarihi</span>
+                    <span class="profile-value" id="public-profile-time"></span>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="public-profile-message-btn" class="btn btn-primary">Mesaj Gönder</button>
+                <button id="public-profile-close" class="btn btn-secondary">Kapat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ NOTIFICATION TOAST ═══════════ -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="/static/js/sounds.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
